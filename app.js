@@ -23,27 +23,62 @@
 //   - azure_realtime : Azure GPT-Realtime 1.5 (single WS API)
 // ============================================================
 
-// Azure Speech Services - voix françaises natives (Neural) + multilingues
-const AZURE_VOICES = [
-    // Masculines FR natives
-    { id: 'fr-FR-HenriNeural',         label: '🇫🇷 Henri (M, FR natif)' },
-    { id: 'fr-FR-ClaudeNeural',        label: '🇫🇷 Claude (M, FR natif)' },
-    { id: 'fr-FR-AlainNeural',         label: '🇫🇷 Alain (M, FR natif)' },
-    { id: 'fr-FR-MauriceNeural',       label: '🇫🇷 Maurice (M, FR natif)' },
-    { id: 'fr-FR-JeromeNeural',        label: '🇫🇷 Jérôme (M, FR natif)' },
-    { id: 'fr-FR-YvesNeural',          label: '🇫🇷 Yves (M, FR natif)' },
-    { id: 'fr-FR-AntoineNeural',       label: '🇫🇷 Antoine (M, FR natif)' },
-    { id: 'fr-FR-RemyMultilingualNeural', label: '🇫🇷 Rémy (M, multilingue)' },
-    // Féminines FR natives
-    { id: 'fr-FR-DeniseNeural',        label: '🇫🇷 Denise (F, FR natif)' },
-    { id: 'fr-FR-EloiseNeural',        label: '🇫🇷 Éloïse (F, FR natif)' },
-    { id: 'fr-FR-BrigitteNeural',      label: '🇫🇷 Brigitte (F, FR natif)' },
-    { id: 'fr-FR-JosephineNeural',     label: '🇫🇷 Joséphine (F, FR natif)' },
-    { id: 'fr-FR-VivienneMultilingualNeural', label: '🇫🇷 Vivienne (F, multilingue)' },
-];
+// ============================================================
+// CATALOGUES DE VOIX PAR LANGUE (fr / en / zh)
+// Structure : VOICES_<ENGINE>[lang] = [{id, label}, ...]
+// ============================================================
 
-// Azure GPT-Realtime voix (OpenAI realtime preset)
-const REALTIME_VOICES = [
+// --- Azure Speech Neural (voix natives par locale) ---
+const AZURE_VOICES = {
+    fr: [
+        { id: 'fr-FR-HenriNeural',                  label: '🇫🇷 Henri (M, FR natif)' },
+        { id: 'fr-FR-ClaudeNeural',                 label: '🇫🇷 Claude (M, FR natif)' },
+        { id: 'fr-FR-AlainNeural',                  label: '🇫🇷 Alain (M, FR natif)' },
+        { id: 'fr-FR-MauriceNeural',                label: '🇫🇷 Maurice (M, FR natif)' },
+        { id: 'fr-FR-JeromeNeural',                 label: '🇫🇷 Jérôme (M, FR natif)' },
+        { id: 'fr-FR-YvesNeural',                   label: '🇫🇷 Yves (M, FR natif)' },
+        { id: 'fr-FR-AntoineNeural',                label: '🇫🇷 Antoine (M, FR natif)' },
+        { id: 'fr-FR-RemyMultilingualNeural',       label: '🇫🇷 Rémy (M, multilingue)' },
+        { id: 'fr-FR-DeniseNeural',                 label: '🇫🇷 Denise (F, FR natif)' },
+        { id: 'fr-FR-EloiseNeural',                 label: '🇫🇷 Éloïse (F, FR natif)' },
+        { id: 'fr-FR-BrigitteNeural',               label: '🇫🇷 Brigitte (F, FR natif)' },
+        { id: 'fr-FR-JosephineNeural',              label: '🇫🇷 Joséphine (F, FR natif)' },
+        { id: 'fr-FR-VivienneMultilingualNeural',   label: '🇫🇷 Vivienne (F, multilingue)' },
+    ],
+    en: [
+        { id: 'en-US-AndrewNeural',     label: '🇺🇸 Andrew (M, US natif)' },
+        { id: 'en-US-BrianNeural',      label: '🇺🇸 Brian (M, US natif)' },
+        { id: 'en-US-DavisNeural',      label: '🇺🇸 Davis (M, US natif)' },
+        { id: 'en-US-GuyNeural',        label: '🇺🇸 Guy (M, US natif)' },
+        { id: 'en-US-JasonNeural',      label: '🇺🇸 Jason (M, US natif)' },
+        { id: 'en-US-TonyNeural',       label: '🇺🇸 Tony (M, US natif)' },
+        { id: 'en-GB-RyanNeural',       label: '🇬🇧 Ryan (M, UK natif)' },
+        { id: 'en-GB-ThomasNeural',     label: '🇬🇧 Thomas (M, UK natif)' },
+        { id: 'en-US-AriaNeural',       label: '🇺🇸 Aria (F, US natif)' },
+        { id: 'en-US-AvaNeural',        label: '🇺🇸 Ava (F, US natif)' },
+        { id: 'en-US-EmmaNeural',       label: '🇺🇸 Emma (F, US natif)' },
+        { id: 'en-US-JennyNeural',      label: '🇺🇸 Jenny (F, US natif)' },
+        { id: 'en-GB-SoniaNeural',      label: '🇬🇧 Sonia (F, UK natif)' },
+    ],
+    zh: [
+        { id: 'zh-CN-YunxiNeural',      label: '🇨🇳 云希 Yunxi (M, MD natif)' },
+        { id: 'zh-CN-YunyangNeural',    label: '🇨🇳 云扬 Yunyang (M, MD natif)' },
+        { id: 'zh-CN-YunjianNeural',    label: '🇨🇳 云健 Yunjian (M, MD natif)' },
+        { id: 'zh-CN-YunxiaNeural',     label: '🇨🇳 云夏 Yunxia (M, MD natif)' },
+        { id: 'zh-CN-YunfengNeural',    label: '🇨🇳 云枫 Yunfeng (M, MD natif)' },
+        { id: 'zh-CN-YunzeNeural',      label: '🇨🇳 云泽 Yunze (M, MD natif)' },
+        { id: 'zh-CN-XiaoxiaoNeural',   label: '🇨🇳 晓晓 Xiaoxiao (F, MD natif)' },
+        { id: 'zh-CN-XiaoyiNeural',     label: '🇨🇳 晓伊 Xiaoyi (F, MD natif)' },
+        { id: 'zh-CN-XiaochenNeural',   label: '🇨🇳 晓辰 Xiaochen (F, MD natif)' },
+        { id: 'zh-CN-XiaohanNeural',    label: '🇨🇳 晓涵 Xiaohan (F, MD natif)' },
+        { id: 'zh-CN-XiaomengNeural',   label: '🇨🇳 晓梦 Xiaomeng (F, MD natif)' },
+        { id: 'zh-CN-XiaomoNeural',     label: '🇨🇳 晓墨 Xiaomo (F, MD natif)' },
+        { id: 'zh-CN-XiaoshuangNeural', label: '🇨🇳 晓双 Xiaoshuang (F, MD natif)' },
+    ],
+};
+
+// --- Azure GPT-Realtime (voix multilingues, mêmes IDs pour les 3 langues) ---
+const REALTIME_VOICES_LIST = [
     { id: 'echo',    label: 'Echo (M, posé)' },
     { id: 'onyx',    label: 'Onyx (M, grave)' },
     { id: 'ash',     label: 'Ash (M, jeune)' },
@@ -58,100 +93,160 @@ const REALTIME_VOICES = [
     { id: 'sage',    label: 'Sage (F)' },
     { id: 'marin',   label: 'Marin (F, naturel)' },
 ];
+const REALTIME_VOICES = { fr: REALTIME_VOICES_LIST, en: REALTIME_VOICES_LIST, zh: REALTIME_VOICES_LIST };
 
-// Mistral Voxtral - 30 voix preset (multilingue 9 langues)
-// Tri : FR natif (zéro accent) → UK (accent UK) → US (accent US fort en FR).
-const MISTRAL_VOICES = [
-    // Français natif — sans accent (recommandées pour parler français)
-    { id: '5a271406-039d-46fe-835b-fbbb00eaf08d', label: '🇫🇷 Marie · Neutre' },
-    { id: '49d024dd-981b-4462-bb17-74d381eb8fd7', label: '🇫🇷 Marie · Heureuse' },
-    { id: '2f62b1af-aea3-4079-9d10-7ca665ee7243', label: '🇫🇷 Marie · Enthousiaste' },
-    { id: 'e0580ce5-e63c-4cbe-88c8-a983b80c5f1f', label: '🇫🇷 Marie · Curieuse' },
-    { id: '4adeb2c6-25a3-44bc-8100-5234dfc1193b', label: '🇫🇷 Marie · Triste' },
-    { id: 'a7c07cdc-1c35-4d87-a938-c610a654f600', label: '🇫🇷 Marie · Énervée' },
+// --- Mistral Voxtral (30 voix multilingues — on découpe par accent natif) ---
+const MISTRAL_VOICES = {
+    fr: [
+        { id: '5a271406-039d-46fe-835b-fbbb00eaf08d', label: '🇫🇷 Marie · Neutre' },
+        { id: '49d024dd-981b-4462-bb17-74d381eb8fd7', label: '🇫🇷 Marie · Heureuse' },
+        { id: '2f62b1af-aea3-4079-9d10-7ca665ee7243', label: '🇫🇷 Marie · Enthousiaste' },
+        { id: 'e0580ce5-e63c-4cbe-88c8-a983b80c5f1f', label: '🇫🇷 Marie · Curieuse' },
+        { id: '4adeb2c6-25a3-44bc-8100-5234dfc1193b', label: '🇫🇷 Marie · Triste' },
+        { id: 'a7c07cdc-1c35-4d87-a938-c610a654f600', label: '🇫🇷 Marie · Énervée' },
+    ],
+    en: [
+        // Voix US (locuteurs natifs anglais)
+        { id: 'c69964a6-ab8b-4f8a-9465-ec0925096ec8', label: '🇺🇸 Paul · Neutral (M)' },
+        { id: '98559b22-62b5-4a64-a7cd-fc78ca41faa8', label: '🇺🇸 Paul · Confident (M)' },
+        { id: '01d985cd-5e0c-4457-bfd8-80ba31a5bc03', label: '🇺🇸 Paul · Cheerful (M)' },
+        { id: '1024d823-a11e-43ee-bf3d-d440dccc0577', label: '🇺🇸 Paul · Happy (M)' },
+        { id: '5940190b-f58a-4c3e-8264-a40d63fd6883', label: '🇺🇸 Paul · Enthusiastic (M)' },
+        // Voix UK
+        { id: 'e3596645-b1af-469e-b857-f18ddedc7652', label: '🇬🇧 Oliver · Neutral (M)' },
+        { id: '8169ab87-bc99-4669-a5ec-6855860ace24', label: '🇬🇧 Oliver · Confident (M)' },
+        { id: 'e8e5b1de-493c-4061-8414-e2170f9f4b6f', label: '🇬🇧 Oliver · Enthusiastic (M)' },
+        { id: '5ad5d44e-6b4e-4a57-a8a8-4cae088034ed', label: '🇬🇧 Oliver · Cheerful (M)' },
+        { id: '390c8a2b-60a6-4882-8437-c49a8bd33b63', label: '🇬🇧 Oliver · Curious (M)' },
+        { id: '82c99ee6-f932-423f-a4a3-d403c8914b8d', label: '🇬🇧 Jane · Neutral (F)' },
+        { id: 'cbe96cf0-85ec-4a10-accb-0b35c93b6dfd', label: '🇬🇧 Jane · Confident (F)' },
+        { id: '5de47977-6e47-4266-a938-3bc1d76b4676', label: '🇬🇧 Jane · Curious (F)' },
+    ],
+    zh: [
+        // Mistral ne dispose pas de voix natives chinoises ; on expose les voix Marie
+        // (accent FR le plus neutre pour articuler le mandarin) à titre de dépannage.
+        // Pour du chinois natif : préfère Azure Speech Neural ou Fish Audio en mode ZH.
+        { id: '5a271406-039d-46fe-835b-fbbb00eaf08d', label: '🌍 Marie · Neutre (accent étranger)' },
+        { id: '49d024dd-981b-4462-bb17-74d381eb8fd7', label: '🌍 Marie · Heureuse (accent étranger)' },
+        { id: '2f62b1af-aea3-4079-9d10-7ca665ee7243', label: '🌍 Marie · Enthousiaste (accent étranger)' },
+        { id: 'e0580ce5-e63c-4cbe-88c8-a983b80c5f1f', label: '🌍 Marie · Curieuse (accent étranger)' },
+        { id: 'c69964a6-ab8b-4f8a-9465-ec0925096ec8', label: '🌍 Paul · Neutre (accent étranger)' },
+        { id: 'e3596645-b1af-469e-b857-f18ddedc7652', label: '🌍 Oliver · Neutre (accent étranger)' },
+    ],
+};
 
-    // Voix masculines UK (accent UK, plus doux que US en FR)
-    { id: 'e3596645-b1af-469e-b857-f18ddedc7652', label: '🇬🇧 Oliver · Neutre (M)' },
-    { id: '8169ab87-bc99-4669-a5ec-6855860ace24', label: '🇬🇧 Oliver · Confiant (M)' },
-    { id: 'e8e5b1de-493c-4061-8414-e2170f9f4b6f', label: '🇬🇧 Oliver · Enthousiaste (M)' },
-    { id: '5ad5d44e-6b4e-4a57-a8a8-4cae088034ed', label: '🇬🇧 Oliver · Enjoué (M)' },
-    { id: '390c8a2b-60a6-4882-8437-c49a8bd33b63', label: '🇬🇧 Oliver · Curieux (M)' },
-    { id: 'd4101b8f-12c3-450d-a812-7d700b3a3245', label: '🇬🇧 Oliver · Triste (M)' },
-    { id: '862274a7-8333-48f7-b668-f19c932999e0', label: '🇬🇧 Oliver · En colère (M)' },
+// --- Fish Audio (s2-pro, voix clonées par langue, sélection top 20 ranked by task_count) ---
+const FISH_VOICES = {
+    fr: [
+        { id: '7e327849fe89489387cb3e016c714834', label: '🎙️ Narrateur HxH (M, grave)' },
+        { id: '4f2a0684dd0247dda68f339738c780e6', label: '🎙️ Le narrateur (M, cinématique)' },
+        { id: '6e10fb8946b34ba6bec447789ccdc3de', label: '🧘 Voix stoïque (M, calme)' },
+        { id: '6d3a8a05a287483ab32da9891d7f7fc9', label: '🎙️ Unique (M, autoritaire)' },
+        { id: 'd1e5c6c4b9694cde8048824ce8116279', label: '📰 Frances 2 (M, sérieux)' },
+        { id: 'daa5fc69eff7437eb1dfe4e2578ca2e9', label: '🎙️ Morpheus (M, mystérieux)' },
+        { id: 'dde9b1e929bd43c0a9c6dd1e502f4f82', label: '📚 SLAX (M, pédago)' },
+        { id: '90c509388f5946e9805c41dcccd93fb7', label: '🧠 Le penseur (M, posé)' },
+        { id: '7a077671da5949589da605a31bcde05e', label: '📺 Voix Secret Story (M, grave)' },
+        { id: '081eafb4e2974f68b5b13d20b8f5995f', label: '🎙️ Le narrateur 2 (M, narration)' },
+        { id: '333fdf6838534ddd8f2ad8a71f0924a8', label: '📖 Narrateur HxH 2 (M, conteur)' },
+        { id: 'b6efa2e7896645c28589046c576ddb2e', label: '🎬 Voix documentaire (M, calme)' },
+        { id: '005138dcb4cb481d8e1b57b9a2ab5633', label: '💬 Arnold (M, conversationnel)' },
+        { id: '276bd156a53f4a0199fff081bf083fc8', label: '🎓 Bon à savoir (M, autoritaire)' },
+        { id: 'f315cac8d48d4449ad73ac0f96099acd', label: '🧙 Vieux sage (M, profond)' },
+        { id: 'f30a4881085d42a1b073a1ca31a67cd8', label: '🎙️ Arnold 2 (M, social media)' },
+        { id: '0d494e6f958c4f96b7aafeec9cc0e460', label: '🎙️ Aaaaaw (M, narration)' },
+        { id: '0e05ee9f8c1f4ceb9ea924a62d7fbad4', label: '🗣️ Gabonais (M, autoritaire)' },
+        { id: 'a2dff3a6e6fa400583f90ce83454c99e', label: '🔔 Mara (M, posé)' },
+        { id: '150a7a6783d84b5298c8c28f33bfe6b8', label: '🎸 Voix rock (M, cinématique)' },
+    ],
+    en: [
+        { id: 'c5f56a6cc2ec4fa8920cb4c5889a3fb7', label: '🎙️ Slax (M, medium)' },
+        { id: '9032b5f2e2554b5a957ad655c052af16', label: '🎙️ Slax 2 (M, narration)' },
+        { id: 'ef9c79b62ef34530bf452c0e50e3c260', label: '🎬 Horror (M, narration)' },
+        { id: '536d3a5e000945adb7038665781a4aca', label: '🎓 Ethan (M, educational)' },
+        { id: '8bed0e9b444046e2bf72da4b251d9a1d', label: '🎙️ Marcus (M, narration)' },
+        { id: 'bf322df2096a46f18c579d0baa36f41d', label: '🎙️ Adrian (M, narration)' },
+        { id: 'd8a1340984ee4b63ad1ffae27a6a4339', label: '🎙️ Elite (M, narration)' },
+        { id: '0e1a691306e44ff2bc26444fc7fe078d', label: '🎙️ Brainrot Voice (M, narration)' },
+        { id: '1936333080804be19655c6749b2ae7b2', label: '📰 Voice DL (M, narration)' },
+        { id: '692a2e659a8748558a1abc97ec051e0e', label: '🎙️ US Clone (M, jeune)' },
+        { id: 'a5971a1fd805441aaf3b0bbe8c9f1ab6', label: '🎙️ Dexter (M, jeune)' },
+        { id: '92a2600282e547f098b4a8de1bc9a44a', label: '🎓 Alhaitham (M, educational)' },
+        { id: '25813ef08fa84e98b60ac8d30b5fdf71', label: '🎙️ Nightmare (M, narration)' },
+        { id: 'f8dfe9c83081432386f143e2fe9767ef', label: '📖 Book Record (M, narration)' },
+        { id: 'fb7ec16ca51a45a5a4db881244d7990a', label: '🎙️ WNBA Voiceover (M, narration)' },
+        { id: 'e0e2468ce2d746c1b20a4414435f6f48', label: '🎙️ Phat Phap (M, narration)' },
+        { id: 'a120c695fb104b43a7bc0a68b0b12805', label: '🎙️ Slax 3 (M, narration)' },
+        { id: 'beb44e5fac1e4b33a15dfcdcc2a9421d', label: '📚 Sleepless Historian (M, educational)' },
+        { id: 'b97618c195814c9fb7558ea34093cd28', label: '🎓 Ton (M, educational)' },
+        { id: '9d1efa1645a34f219cfb0ac605960a14', label: '🎙️ Bii2 (M, narration)' },
+    ],
+    zh: [
+        { id: '54a5170264694bfc8e9ad98df7bd89c3', label: '🎙️ 丁真 Dingzhen (M, jeune)' },
+        { id: '59cb5986671546eaa6ca8ae6f29f6d22', label: '📺 央视配音 CCTV (M, narration)' },
+        { id: 'e4642e5edccd4d9ab61a69e82d4f8a14', label: '🎙️ 蔡徐坤 Cai Xukun (M, jeune)' },
+        { id: '4f201abba2574feeae11e5ebf737859e', label: '📢 王琨 Wang Kun (M, pub)' },
+        { id: 'dd43b30d04d9446a94ebe41f301229b5', label: '🎬 宣传片 Promo (M, narration)' },
+        { id: '918a8277663d476b95e2c4867da0f6a6', label: '🎙️ 蒋介石 Style (M, narration)' },
+        { id: 'e80ea225770f42f79d50aa98be3cedfc', label: '🎙️ 孙笑川 Sun Xiaochuan (M, casual)' },
+        { id: '332941d1360c48949f1b4e0cabf912cd', label: '🎙️ 丁真 v2 (M, narration)' },
+        { id: 'ca8fb681ce2040958c15ede5eef86177', label: '💼 郑翔洲 Zheng (M, pro)' },
+        { id: 'c7cbda1c101c4ce8906c046f01eca1a2', label: '🎙️ 董宇辉 Dong Yuhui (M, narration)' },
+        { id: '7c66db6e457c4d53b1fe428a8c547953', label: '💬 郭德纲 Style (M, conversationnel)' },
+        { id: 'bc9e47fd83a04010ad6617ed54b92ee3', label: '🎓 樊登 Style (M, educational)' },
+        { id: '1512d05841734931bf905d0520c272b1', label: '🎙️ 周杰伦 Style (M, jeune)' },
+        { id: '62222f4a424349828331888d19c9b594', label: '🎓 孙正聿 (M, educational)' },
+        { id: '21082ac382d945e29aea354e90380f11', label: '📢 仿真人 (M, pub)' },
+        { id: 'f6f293aabfe24e46aff0fc309c233d31', label: '🎭 曹操 Caocao (M, dramatique)' },
+        { id: '7bc6a44bd2a9498c9e750acfbddadebf', label: '🎓 盛国恒 Sheng (M, educational)' },
+        { id: '80cf680e668c44fc8d5795f80d903f7a', label: '🎙️ 贾小军 Jia (M, narration)' },
+        { id: '405736979e244634914add64e37290b0', label: '📢 麦克阿瑟 Style (M, pub)' },
+        { id: '4e6384a9da6c4d7088e85ea163d6d1de', label: '💬 二狗 Ergou (M, jeune)' },
+    ],
+};
 
-    // Voix féminines UK
-    { id: '82c99ee6-f932-423f-a4a3-d403c8914b8d', label: '🇬🇧 Jane · Neutre (F)' },
-    { id: 'cbe96cf0-85ec-4a10-accb-0b35c93b6dfd', label: '🇬🇧 Jane · Confiante (F)' },
-    { id: '5de47977-6e47-4266-a938-3bc1d76b4676', label: '🇬🇧 Jane · Curieuse (F)' },
-    { id: 'a3e41ea8-020b-44c0-8d8b-f6cc03524e31', label: '🇬🇧 Jane · Sarcasme (F)' },
-    { id: '7d0a90a3-c211-4489-aaa0-61269299edc7', label: '🇬🇧 Jane · Perplexe (F)' },
-    { id: '60844938-221d-4d1e-8233-34203f787d9f', label: '🇬🇧 Jane · Frustrée (F)' },
-    { id: 'e7168caa-f7ed-4e1c-98a1-434251f4f2b0', label: '🇬🇧 Jane · Jalouse (F)' },
-    { id: '230ccacf-8800-4aa0-8ac2-8d004f1d9fb7', label: '🇬🇧 Jane · Gênée (F)' },
-    { id: 'c7a8eb83-5247-4540-89f3-6650d349100d', label: '🇬🇧 Jane · Triste (F)' },
-
-    // Voix US (accent US, le plus marqué en FR)
-    { id: 'c69964a6-ab8b-4f8a-9465-ec0925096ec8', label: '🇺🇸 Paul · Neutre (M)' },
-    { id: '98559b22-62b5-4a64-a7cd-fc78ca41faa8', label: '🇺🇸 Paul · Confiant (M)' },
-    { id: '01d985cd-5e0c-4457-bfd8-80ba31a5bc03', label: '🇺🇸 Paul · Enjoué (M)' },
-    { id: '1024d823-a11e-43ee-bf3d-d440dccc0577', label: '🇺🇸 Paul · Heureux (M)' },
-    { id: '5940190b-f58a-4c3e-8264-a40d63fd6883', label: '🇺🇸 Paul · Enthousiaste (M)' },
-    { id: '1f017bcb-02e5-460d-989b-db065c0c6122', label: '🇺🇸 Paul · Frustré (M)' },
-    { id: '530e2e20-58e2-45d8-b0a5-4594f4915944', label: '🇺🇸 Paul · Triste (M)' },
-    { id: 'cb891218-482c-4392-9878-91e8d999d57a', label: '🇺🇸 Paul · En colère (M)' },
-];
-
-// Fish Audio - voix masculines françaises clonées (s2-pro, ~1s latence)
-// Top 20 sélectionnées par task_count (popularité d'usage) après filtre :
-//   - exclu personnalités publiques nommées explicitement
-//   - exclu tags character/animated/playful (style anime/meme)
-//   - garde tags professional/narration/calm/deep/conversational
-const FISH_VOICES = [
-    { id: '7e327849fe89489387cb3e016c714834', label: '🎙️ Narrateur HxH (M, grave)' },
-    { id: '4f2a0684dd0247dda68f339738c780e6', label: '🎙️ Le narrateur (M, cinématique)' },
-    { id: '6e10fb8946b34ba6bec447789ccdc3de', label: '🧘 Voix stoïque (M, calme)' },
-    { id: '6d3a8a05a287483ab32da9891d7f7fc9', label: '🎙️ Unique (M, autoritaire)' },
-    { id: 'd1e5c6c4b9694cde8048824ce8116279', label: '📰 Frances 2 (M, sérieux)' },
-    { id: 'daa5fc69eff7437eb1dfe4e2578ca2e9', label: '🎙️ Morpheus (M, mystérieux)' },
-    { id: 'dde9b1e929bd43c0a9c6dd1e502f4f82', label: '📚 SLAX (M, pédago)' },
-    { id: '90c509388f5946e9805c41dcccd93fb7', label: '🧠 Le penseur (M, posé)' },
-    { id: '7a077671da5949589da605a31bcde05e', label: '📺 Voix Secret Story (M, grave)' },
-    { id: '081eafb4e2974f68b5b13d20b8f5995f', label: '🎙️ Le narrateur 2 (M, narration)' },
-    { id: '333fdf6838534ddd8f2ad8a71f0924a8', label: '📖 Narrateur HxH 2 (M, conteur)' },
-    { id: 'b6efa2e7896645c28589046c576ddb2e', label: '🎬 Voix documentaire (M, calme)' },
-    { id: '005138dcb4cb481d8e1b57b9a2ab5633', label: '💬 Arnold (M, conversationnel)' },
-    { id: '276bd156a53f4a0199fff081bf083fc8', label: '🎓 Bon à savoir (M, autoritaire)' },
-    { id: 'f315cac8d48d4449ad73ac0f96099acd', label: '🧙 Vieux sage (M, profond)' },
-    { id: 'f30a4881085d42a1b073a1ca31a67cd8', label: '🎙️ Arnold 2 (M, social media)' },
-    { id: '0d494e6f958c4f96b7aafeec9cc0e460', label: '🎙️ Aaaaaw (M, narration)' },
-    { id: '0e05ee9f8c1f4ceb9ea924a62d7fbad4', label: '🗣️ Gabonais (M, autoritaire)' },
-    { id: 'a2dff3a6e6fa400583f90ce83454c99e', label: '🔔 Mara (M, posé)' },
-    { id: '150a7a6783d84b5298c8c28f33bfe6b8', label: '🎸 Voix rock (M, cinématique)' },
-];
-
-// Map engine → catalogue + label
+// Map engine → label + catalogues par langue + voix par défaut par langue
 const VOICE_ENGINES = {
     azure_tts: {
-        label: '🇫🇷 Azure Speech (Henri/Claude FR natifs)',
-        voices: AZURE_VOICES,
-        defaultVoice: 'fr-FR-HenriNeural',
+        label: '🌍 Azure Speech Neural',
+        voicesByLang: AZURE_VOICES,
+        defaultVoiceByLang: {
+            fr: 'fr-FR-HenriNeural',
+            en: 'en-US-AndrewNeural',
+            zh: 'zh-CN-YunxiNeural',
+        },
     },
     mistral: {
-        label: 'Mistral Voxtral (Marie FR / Paul / Oliver / Jane)',
-        voices: MISTRAL_VOICES,
-        defaultVoice: '5a271406-039d-46fe-835b-fbbb00eaf08d',  // Marie Neutre
+        label: '🌐 Mistral Voxtral',
+        voicesByLang: MISTRAL_VOICES,
+        defaultVoiceByLang: {
+            fr: '5a271406-039d-46fe-835b-fbbb00eaf08d',   // Marie Neutre
+            en: 'e3596645-b1af-469e-b857-f18ddedc7652',   // Oliver Neutral
+            zh: '5a271406-039d-46fe-835b-fbbb00eaf08d',   // Marie Neutre (fallback accent étranger)
+        },
     },
     azure_realtime: {
-        label: '⚡ Azure GPT-Realtime 1.5 (chat+TTS combinés)',
-        voices: REALTIME_VOICES,
-        defaultVoice: 'echo',
+        label: '⚡ Azure GPT-Realtime 1.5',
+        voicesByLang: REALTIME_VOICES,
+        defaultVoiceByLang: { fr: 'echo', en: 'echo', zh: 'echo' },
     },
     fish_audio: {
-        label: '🐟 Fish Audio s2-pro (voix FR clonées)',
-        voices: FISH_VOICES,
-        defaultVoice: '4f2a0684dd0247dda68f339738c780e6',  // Le narrateur
+        label: '🐟 Fish Audio s2-pro',
+        voicesByLang: FISH_VOICES,
+        defaultVoiceByLang: {
+            fr: '4f2a0684dd0247dda68f339738c780e6',   // Le narrateur (FR)
+            en: 'c5f56a6cc2ec4fa8920cb4c5889a3fb7',   // Slax (EN)
+            zh: '59cb5986671546eaa6ca8ae6f29f6d22',   // 央视配音 CCTV (ZH)
+        },
     },
 };
+
+// Langues supportées (UI + envoyé au serveur pour choisir le system prompt)
+const LANGUAGES = [
+    { id: 'fr', label: '🇫🇷 Français' },
+    { id: 'en', label: '🇺🇸 English' },
+    { id: 'zh', label: '🇨🇳 中文' },
+];
 
 const AVATARS = {
     eric: {
@@ -275,7 +370,13 @@ class AvatarController {
 
         // Paramètres TTS / lip-sync
         this.selectedEngine = this.avatarConfig.engine || 'mistral';
-        this.selectedVoice = this.avatarConfig.voice;
+        // Langue de réponse : 'fr' | 'en' | 'zh' (persistée). Détermine le system prompt
+        // côté serveur ET filtre les voix disponibles dans le dropdown.
+        const savedLang = localStorage.getItem('avatar_language');
+        this.selectedLanguage = (savedLang && ['fr','en','zh'].includes(savedLang)) ? savedLang : 'fr';
+        // Voix : on prend la voix par défaut de l'engine pour la langue sélectionnée
+        this.selectedVoice = VOICE_ENGINES[this.selectedEngine]?.defaultVoiceByLang?.[this.selectedLanguage]
+                          || this.avatarConfig.voice;
         // Migration : default minSilenceDuration changé de 0.7s → 0.4s. On bump une version
         // pour forcer le reset des prefs existantes (sinon les users gardent leur 0.7 en cache).
         try {
@@ -361,6 +462,27 @@ class AvatarController {
     // SETTINGS UI
     // ============================================================
     setupSettingsUI() {
+        // Populate language dropdown
+        this.languageSelect = document.getElementById('languageSelect');
+        if (this.languageSelect) {
+            this.languageSelect.innerHTML = '';
+            for (const l of LANGUAGES) {
+                const opt = document.createElement('option');
+                opt.value = l.id;
+                opt.textContent = l.label;
+                this.languageSelect.appendChild(opt);
+            }
+            this.languageSelect.value = this.selectedLanguage;
+            this.languageSelect.addEventListener('change', (e) => {
+                this.selectedLanguage = e.target.value;
+                localStorage.setItem('avatar_language', this.selectedLanguage);
+                // Reset à la voix par défaut de l'engine pour cette nouvelle langue
+                this.selectedVoice = VOICE_ENGINES[this.selectedEngine].defaultVoiceByLang[this.selectedLanguage];
+                this.populateVoiceDropdown();
+                console.log(`[LANG] → ${this.selectedLanguage}, voice=${this.selectedVoice}`);
+            });
+        }
+
         // Populate engine dropdown
         this.engineSelect = document.getElementById('engineSelect');
         if (this.engineSelect) {
@@ -374,14 +496,14 @@ class AvatarController {
             this.engineSelect.value = this.selectedEngine;
             this.engineSelect.addEventListener('change', (e) => {
                 this.selectedEngine = e.target.value;
-                // Reset à la voix par défaut de cet engine
-                this.selectedVoice = VOICE_ENGINES[this.selectedEngine].defaultVoice;
+                // Reset à la voix par défaut de cet engine pour la langue courante
+                this.selectedVoice = VOICE_ENGINES[this.selectedEngine].defaultVoiceByLang[this.selectedLanguage];
                 this.populateVoiceDropdown();
-                console.log(`[ENGINE] switched to ${this.selectedEngine}, voice=${this.selectedVoice}`);
+                console.log(`[ENGINE] switched to ${this.selectedEngine}, lang=${this.selectedLanguage}, voice=${this.selectedVoice}`);
             });
         }
 
-        // Voice dropdown initial (selon l'engine actif)
+        // Voice dropdown initial (selon engine ET langue actifs)
         this.populateVoiceDropdown();
 
         // Pré-remplir les selects avec les valeurs courantes
@@ -606,20 +728,21 @@ class AvatarController {
         }
     }
 
-    // Remplit le voice dropdown depuis le catalogue de l'engine actif
+    // Remplit le voice dropdown depuis le catalogue de l'engine actif POUR la langue active
     populateVoiceDropdown() {
         const engineCfg = VOICE_ENGINES[this.selectedEngine];
         if (!engineCfg) return;
+        const voices = engineCfg.voicesByLang[this.selectedLanguage] || engineCfg.voicesByLang.fr || [];
         this.voiceSelect.innerHTML = '';
-        for (const v of engineCfg.voices) {
+        for (const v of voices) {
             const opt = document.createElement('option');
             opt.value = v.id;
             opt.textContent = v.label;
             this.voiceSelect.appendChild(opt);
         }
-        // Si la voix courante n'est pas dans ce catalogue, prendre la default
-        if (!engineCfg.voices.find(v => v.id === this.selectedVoice)) {
-            this.selectedVoice = engineCfg.defaultVoice;
+        // Si la voix courante n'est pas dans ce catalogue, prendre la default de cette langue
+        if (!voices.find(v => v.id === this.selectedVoice)) {
+            this.selectedVoice = engineCfg.defaultVoiceByLang[this.selectedLanguage];
         }
         this.voiceSelect.value = this.selectedVoice;
     }
@@ -1281,6 +1404,7 @@ class AvatarController {
                     text: message,
                     voice: this.selectedVoice,
                     engine: this.selectedEngine,
+                    language: this.selectedLanguage,   // 'fr' | 'en' | 'zh' — pour system prompt côté serveur
                     temperature: this.realtimeTemperature,   // ignoré pour mistral / azure_tts
                     // Cap les N derniers messages — le serveur reclampe aussi (défense en profondeur)
                     history: this.conversationHistory.slice(-this.HISTORY_LIMIT),

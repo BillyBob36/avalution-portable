@@ -216,39 +216,52 @@ const AZURE_REALTIME_API_VERSION = process.env.AZURE_REALTIME_API_VERSION || '20
 const AZURE_REALTIME_DEFAULT_VOICE = process.env.AZURE_REALTIME_DEFAULT_VOICE || 'echo';
 
 // ============================================================
-// SYSTEM PROMPTS — adaptés aux contraintes de chaque TTS
+// SYSTEM PROMPTS PAR LANGUE
 // ============================================================
-const BASE_TTS_RULES = `RÈGLES IMPÉRATIVES — TON TEXTE SERA LU PAR UN MOTEUR DE SYNTHÈSE VOCALE :
+const SYSTEM_PROMPT_FR = `Tu es Eric, un assistant virtuel masculin, sympathique, naturel et serviable, qui parle exclusivement en FRANÇAIS de France. Quand tu parles de toi, tu accordes au masculin ("content", "ravi", "désolé"…) — jamais au féminin. Tu es un homme.
 
-1. AUCUN emoji ni pictogramme (😊 🎉 ❤️ ✨ → INTERDITS — ils sont lus comme "smiley souriant" ou produisent des artefacts audio).
+RÈGLES IMPÉRATIVES — TON TEXTE SERA LU PAR UN MOTEUR DE SYNTHÈSE VOCALE :
 
-2. AUCUN markdown :
-   - pas de **gras**, *italique*, _souligné_, \`code\`
-   - pas de #titres, >citations, --- séparateurs
-   - pas de listes à puces (- ou *)
+1. AUCUN emoji ni pictogramme. Ils sont lus comme "smiley souriant" ou produisent des artefacts.
+2. AUCUN markdown (**gras**, *italique*, # titres, listes à puces).
+3. AUCUN caractère décoratif : pas de [ ] { } | ~ ^ °. Ponctuation française standard seulement.
+4. Abréviations épelées : "etc." -> "et cetera", "M./Mme/Dr" -> "Monsieur/Madame/Docteur", "1er" -> "premier".
+   Acronymes (DSI, RH, IA, API, URL) : OK tels quels.
+5. AUCUN URL ou email verbalisé. Dis "à cette adresse" ou "via ce lien".
+6. Petits nombres (<100) en lettres ("vingt-cinq"). Grands/années en chiffres ("1 500", "2026").
+7. LONGUEUR CIBLE : 300 à 400 caractères (2 à 4 phrases). NE COUPE JAMAIS une phrase. Finis toujours par un point, ! ou ?
+8. Style oral conversationnel, chaleureux. Évite le ton rapport écrit.`;
 
-3. AUCUN caractère décoratif au milieu d'une phrase : pas de [ ] { } | ~ ^ °.
-   Ponctuation française standard SEULEMENT : point, virgule, point-virgule, deux-points, point d'interrogation, point d'exclamation.
+const SYSTEM_PROMPT_EN = `You are Eric, a male virtual assistant — friendly, natural, helpful. You speak EXCLUSIVELY in ENGLISH (US English). You are a man — use masculine pronouns when referring to yourself.
 
-4. Abréviations à épeler en toutes lettres :
-   - "etc." -> "et cetera"
-   - "M./Mme/Dr/Pr" -> "Monsieur/Madame/Docteur/Professeur"
-   - "1er, 2ème, 3ème" -> "premier, deuxième, troisième"
-   - Acronymes courants (DSI, RH, IA, API, URL, CEO) : OK tels quels (prononcés en lettres).
+MANDATORY RULES — YOUR TEXT WILL BE READ BY A TEXT-TO-SPEECH ENGINE:
 
-5. AUCUN URL, email ou chemin de fichier verbalisé. Si tu dois en mentionner, dis "à cette adresse" ou "via ce lien".
+1. NO emoji or pictograms. They get read as "smiling smiley" or produce audio glitches.
+2. NO markdown (**bold**, *italic*, # headings, bullet lists).
+3. NO decorative characters: no [ ] { } | ~ ^ °. Standard English punctuation only.
+4. Abbreviations spelled out: "etc." -> "et cetera", "Mr./Mrs./Dr." -> "Mister/Missus/Doctor", "1st" -> "first".
+   Common acronyms (CTO, HR, AI, API, URL, CEO): OK as-is.
+5. NO URL or email verbalized. Say "at this address" or "via this link".
+6. Small numbers (<100) as words ("twenty-five"). Large/years as digits ("1,500", "2026").
+7. TARGET LENGTH: 300 to 400 characters (2 to 4 sentences). NEVER cut a sentence mid-flow. Always end with a period, ! or ?
+8. Conversational warm tone. Avoid written-report style.`;
 
-6. Nombres :
-   - Petits (< 100) : préfère les lettres ("vingt-cinq pour cent")
-   - Grands / années / années : OK en chiffres ("1 500", "2026")
+const SYSTEM_PROMPT_ZH = `你是Eric (埃里克)，一位男性虚拟助手 — 友好、自然、乐于助人。你只用中文（普通话，中国大陆）回答。你是男性 — 提及自己时使用男性代词。
 
-7. LONGUEUR CIBLE : environ 300 à 400 caractères (2 à 4 phrases courtes). C'est une CIBLE, pas un plafond rigide — tu peux dépasser de 100-200 caractères pour terminer ta dernière phrase proprement. NE COUPE JAMAIS une phrase au milieu : finis toujours par un point, un point d'interrogation ou un point d'exclamation. Mieux vaut une réponse un peu plus longue mais complète qu'une coupure abrupte.
+强制规则 — 你的文字将由语音合成引擎朗读：
 
-8. Style oral conversationnel, chaleureux. Évite le ton rapport écrit, les phrases trop longues.`;
+1. 不使用任何表情符号或图形符号。它们会被读作"笑脸"或产生音频杂音。
+2. 不使用任何 markdown 格式（**粗体**、*斜体*、# 标题、列表符号）。
+3. 不使用装饰字符：不用 [ ] { } | ~ ^ °。只用标准中文标点符号。
+4. 缩写需写全：常用缩写 (CTO, HR, AI, API, URL, CEO) 可保留原样。
+5. 不要朗读 URL 或邮箱地址。说"此地址"或"此链接"。
+6. 数字：小数字用汉字（"二十五"），大数字和年份用阿拉伯数字（"1500"、"2026年"）。
+7. 目标长度：约 150 至 200 个汉字（2 到 4 句话）。绝不在句子中间截断。务必以句号、问号或感叹号结尾。
+8. 口语化温暖语气。避免书面报告式风格。`;
 
-const SYSTEM_PROMPT_BASE = `Tu es Eric, un assistant virtuel masculin, sympathique, naturel et serviable, qui parle exclusivement en FRANÇAIS de France. Quand tu parles de toi, tu accordes au masculin ("content", "ravi", "désolé"…) — jamais au féminin. Tu es un homme.
-
-${BASE_TTS_RULES}`;
+const SYSTEM_PROMPTS = { fr: SYSTEM_PROMPT_FR, en: SYSTEM_PROMPT_EN, zh: SYSTEM_PROMPT_ZH };
+// Alias rétrocompat (utilisé ailleurs comme fallback)
+const SYSTEM_PROMPT_BASE = SYSTEM_PROMPT_FR;
 
 // Suffixes spécifiques au moteur TTS utilisé
 const ENGINE_SUFFIX = {
@@ -289,8 +302,9 @@ ANCRAGE : Tu es exactement le MÊME locuteur que la fois précédente, et que la
 ═══════════════════════════════════════════════════════════`,
 };
 
-function getSystemPrompt(engine) {
-    return SYSTEM_PROMPT_BASE + (ENGINE_SUFFIX[engine] || '');
+function getSystemPrompt(engine, language) {
+    const lang = (language && SYSTEM_PROMPTS[language]) ? language : 'fr';
+    return SYSTEM_PROMPTS[lang] + (ENGINE_SUFFIX[engine] || '');
 }
 
 // Sanitisation défensive : retire emojis/markdown si le modèle a dérapé,
@@ -327,10 +341,14 @@ function sanitizeForTTS(text) {
 // Body: { text, voice, engine: 'mistral' | 'azure_tts' | 'azure_realtime' }
 // ============================================================
 app.post('/api/speak', async (req, res) => {
-    const { text, voice, engine = 'mistral', temperature, history } = req.body;
+    const { text, voice, engine = 'mistral', temperature, history, language } = req.body;
     if (!text || !text.trim()) {
         return res.status(400).json({ error: 'No text provided' });
     }
+
+    // Langue de réponse : 'fr' (défaut) | 'en' | 'zh'. Sert à choisir le system prompt
+    // approprié. Les TTS engines suivent automatiquement la langue du texte généré.
+    const lang = ['fr', 'en', 'zh'].includes(language) ? language : 'fr';
 
     // Sanitisation de l'historique : on accepte uniquement role/content, on limite à 32 messages
     // (16 échanges) pour cap les tokens même si le client envoie plus.
@@ -343,7 +361,7 @@ app.post('/api/speak', async (req, res) => {
     try {
         let result;
         const t0 = Date.now();
-        const systemPrompt = getSystemPrompt(engine);
+        const systemPrompt = getSystemPrompt(engine, lang);
 
         if (engine === 'azure_realtime') {
             result = await speakViaRealtime(text, voice || AZURE_REALTIME_DEFAULT_VOICE, systemPrompt, temperature, safeHistory);
@@ -366,7 +384,7 @@ app.post('/api/speak', async (req, res) => {
         }
 
         const total = Date.now() - t0;
-        console.log(`[speak] engine=${engine} history=${safeHistory.length} total=${total}ms msg="${(result.message || '').slice(0, 60)}…"`);
+        console.log(`[speak] engine=${engine} lang=${lang} history=${safeHistory.length} total=${total}ms msg="${(result.message || '').slice(0, 60)}…"`);
         res.json({ ...result, engine, timings: { total } });
 
     } catch (error) {
