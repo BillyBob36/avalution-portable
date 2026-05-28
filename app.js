@@ -243,7 +243,17 @@ class AvatarController {
         // Paramètres TTS / lip-sync
         this.selectedEngine = this.avatarConfig.engine || 'mistral';
         this.selectedVoice = this.avatarConfig.voice;
-        this.minSilenceDuration = parseFloat(localStorage.getItem('avatar_min_silence') || '0.7');  // seuil silence (s)
+        // Migration : default minSilenceDuration changé de 0.7s → 0.4s. On bump une version
+        // pour forcer le reset des prefs existantes (sinon les users gardent leur 0.7 en cache).
+        try {
+            const MIN_SILENCE_VERSION = 2;
+            const saved = parseInt(localStorage.getItem('avatar_min_silence_version') || '1', 10);
+            if (saved < MIN_SILENCE_VERSION) {
+                localStorage.removeItem('avatar_min_silence');
+                localStorage.setItem('avatar_min_silence_version', String(MIN_SILENCE_VERSION));
+            }
+        } catch (_) {}
+        this.minSilenceDuration = parseFloat(localStorage.getItem('avatar_min_silence') || '0.4');  // seuil silence (s)
         this.realtimeTemperature = parseFloat(localStorage.getItem('avatar_temperature') || '1.2'); // 0.6 - 1.2 (Azure realtime)
 
         // Mémoire conversationnelle : array de {role: 'user'|'assistant', content: '...'}
