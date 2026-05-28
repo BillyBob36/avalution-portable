@@ -1361,7 +1361,10 @@ class AvatarController {
         const segments = [];
 
         const windowSize = Math.floor(sampleRate * 0.05);   // 50 ms
-        const silenceThreshold = 0.02;
+        // 0.005 = au-dessus du bruit de fond GPT-Realtime (max ~0.0005 observé)
+        // mais sous la traîne audible des mots (qui descend à 0.005-0.020).
+        // Mesuré empiriquement sur 3 samples — voir scripts/analyze_silence.js.
+        const silenceThreshold = 0.005;
         const minSilenceDuration = this.minSilenceDuration;
 
         let silenceStart = null;
@@ -1395,6 +1398,18 @@ class AvatarController {
             if (silenceDuration >= minSilenceDuration) {
                 segments.push({ start: silenceStart, end: audioDuration });
             }
+        }
+
+        // POST-PADDING — Piste 1 d'amélioration synchro
+        // On décale le DÉBUT de chaque silence vers le futur de 150 ms.
+        // Effet : le segment speak précédent s'étend de 150 ms dans la zone "trail audible".
+        // Cas couvert : la traîne acoustique des voyelles/consonnes finales (sous le threshold
+        // RMS mais encore perçue à l'oreille). Sans ça, l'avatar fermerait la bouche pendant
+        // les dernières millisecondes de son qui finissent de jouer.
+        // Le clamp `end - 0.05` garantit qu'on ne crée pas un silence de durée nulle ou négative.
+        const SILENCE_START_POST_PAD = 0.15;   // 150 ms
+        for (const seg of segments) {
+            seg.start = Math.min(seg.start + SILENCE_START_POST_PAD, seg.end - 0.05);
         }
 
         this.lastSoundTime = lastSoundTime;
@@ -1536,7 +1551,13 @@ class AvatarController {
         // Si pitch != 0, l'audio joue à effectiveRate (couplage pitch/speed via detune).
         // On compense pour que le lookup timeline reste synchrone avec l'audio entendu.
         const effectiveRate = this.pitchCents === 0 ? 1 : Math.pow(2, this.pitchCents / 1200);
-        const audioPosition = wallClockElapsed * effectiveRate;
+        // VISUAL LOOKAHEAD — Piste 2 d'amélioration synchro
+        // L'avatar montre la frame correspondant à audio_time + 50 ms.
+        // Reproduit la préparation motrice naturelle (la bouche s'ouvre légèrement AVANT le son
+        // chez les vrais locuteurs). 50 ms = valeur "sweet spot" mesurée dans les études
+        // d'articulation. Imperceptible techniquement, mais le cerveau apprécie.
+        const VISUAL_LOOKAHEAD = 0.05;
+        const audioPosition = wallClockElapsed * effectiveRate + VISUAL_LOOKAHEAD;
         if (audioPosition >= this.audioDuration) return;
 
         const currentSegment = this.getCurrentSegment(audioPosition);
