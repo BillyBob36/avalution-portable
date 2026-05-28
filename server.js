@@ -203,6 +203,12 @@ const AZURE_SPEECH_KEY = process.env.AZURE_SPEECH_KEY;
 const AZURE_SPEECH_DEFAULT_VOICE = process.env.AZURE_SPEECH_DEFAULT_VOICE || 'fr-FR-HenriNeural';
 const AZURE_SPEECH_OUTPUT_FORMAT = process.env.AZURE_SPEECH_OUTPUT_FORMAT || 'riff-24khz-16bit-mono-pcm';
 
+const FISH_AUDIO_ENDPOINT = process.env.FISH_AUDIO_ENDPOINT || 'https://api.fish.audio/v1/tts';
+const FISH_AUDIO_KEY = process.env.FISH_AUDIO_KEY;
+const FISH_AUDIO_MODEL = process.env.FISH_AUDIO_MODEL || 's2-pro';
+// Voix par défaut Fish Audio (voix de narrateur générique populaire)
+const FISH_AUDIO_DEFAULT_VOICE = process.env.FISH_AUDIO_DEFAULT_VOICE || '4f2a0684dd0247dda68f339738c780e6';
+
 const AZURE_REALTIME_ENDPOINT = process.env.AZURE_REALTIME_ENDPOINT;
 const AZURE_REALTIME_KEY = process.env.AZURE_REALTIME_KEY;
 const AZURE_REALTIME_DEPLOYMENT = process.env.AZURE_REALTIME_DEPLOYMENT || 'gpt-realtime-1.5';
@@ -248,6 +254,7 @@ ${BASE_TTS_RULES}`;
 const ENGINE_SUFFIX = {
     mistral: `\n\n9. Limite TECHNIQUE Mistral Voxtral : 300 mots maximum. Reste bien en deçà.`,
     azure_tts: `\n\n9. Le moteur Azure Speech gère automatiquement les pauses (virgules, points). Ponctue normalement.`,
+    fish_audio: `\n\n9. Le moteur Fish Audio est sensible à la ponctuation pour le rythme : utilise virgules et points généreusement pour guider les pauses naturelles.`,
     azure_realtime: `
 
 9. Tu vas TOI-MÊME prononcer ta réponse vocalement. Tu dois suivre RIGOUREUSEMENT les règles de voix ci-dessous, à CHAQUE interaction, sans exception.
@@ -345,6 +352,11 @@ app.post('/api/speak', async (req, res) => {
             const clean = sanitizeForTTS(chatResponse);
             const audio = await callAzureSpeech(clean, voice || AZURE_SPEECH_DEFAULT_VOICE);
             result = { message: chatResponse, audio, format: 'wav' };
+        } else if (engine === 'fish_audio') {
+            const chatResponse = await callAzureChat(text, systemPrompt, safeHistory);
+            const clean = sanitizeForTTS(chatResponse);
+            const audio = await callFishAudio(clean, voice || FISH_AUDIO_DEFAULT_VOICE);
+            result = { message: chatResponse, audio, format: 'wav' };
         } else {
             // default: mistral
             const chatResponse = await callAzureChat(text, systemPrompt, safeHistory);
@@ -399,6 +411,43 @@ async function callAzureChat(userMessage, systemPrompt, history) {
     }
     const data = await response.json();
     return data.choices?.[0]?.message?.content || '';
+}
+
+// ============================================================
+// TTS Engine 4 : Fish Audio (s2-pro, voix françaises clonées via reference_id)
+// ============================================================
+async function callFishAudio(text, voiceId) {
+    if (!FISH_AUDIO_KEY) throw new Error('Fish Audio not configured');
+    const body = {
+        text,
+        reference_id: voiceId,
+        format: 'wav',
+        sample_rate: 24000,       // cohérent avec notre pipeline (Azure Realtime utilise aussi 24k)
+        latency: 'normal',
+        // Temperature/top_p par défaut (0.7) — bon équilibre clarté/expressivité pour FR
+        prosody: {
+            speed: 1,
+            volume: 0,
+            normalize_loudness: true,
+        },
+        normalize: true,
+    };
+    const response = await fetch(FISH_AUDIO_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${FISH_AUDIO_KEY}`,
+            'model': FISH_AUDIO_MODEL,    // s2-pro
+        },
+        body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+        const txt = await response.text();
+        throw new Error(`Fish Audio ${response.status}: ${txt.slice(0, 200)}`);
+    }
+    // Fish Audio renvoie le binaire WAV directement
+    const buf = Buffer.from(await response.arrayBuffer());
+    return buf.toString('base64');
 }
 
 // ============================================================

@@ -101,6 +101,34 @@ const MISTRAL_VOICES = [
     { id: 'cb891218-482c-4392-9878-91e8d999d57a', label: '🇺🇸 Paul · En colère (M)' },
 ];
 
+// Fish Audio - voix masculines françaises clonées (s2-pro, ~1s latence)
+// Top 20 sélectionnées par task_count (popularité d'usage) après filtre :
+//   - exclu personnalités publiques nommées explicitement
+//   - exclu tags character/animated/playful (style anime/meme)
+//   - garde tags professional/narration/calm/deep/conversational
+const FISH_VOICES = [
+    { id: '7e327849fe89489387cb3e016c714834', label: '🎙️ Narrateur HxH (M, grave)' },
+    { id: '4f2a0684dd0247dda68f339738c780e6', label: '🎙️ Le narrateur (M, cinématique)' },
+    { id: '6e10fb8946b34ba6bec447789ccdc3de', label: '🧘 Voix stoïque (M, calme)' },
+    { id: '6d3a8a05a287483ab32da9891d7f7fc9', label: '🎙️ Unique (M, autoritaire)' },
+    { id: 'd1e5c6c4b9694cde8048824ce8116279', label: '📰 Frances 2 (M, sérieux)' },
+    { id: 'daa5fc69eff7437eb1dfe4e2578ca2e9', label: '🎙️ Morpheus (M, mystérieux)' },
+    { id: 'dde9b1e929bd43c0a9c6dd1e502f4f82', label: '📚 SLAX (M, pédago)' },
+    { id: '90c509388f5946e9805c41dcccd93fb7', label: '🧠 Le penseur (M, posé)' },
+    { id: '7a077671da5949589da605a31bcde05e', label: '📺 Voix Secret Story (M, grave)' },
+    { id: '081eafb4e2974f68b5b13d20b8f5995f', label: '🎙️ Le narrateur 2 (M, narration)' },
+    { id: '333fdf6838534ddd8f2ad8a71f0924a8', label: '📖 Narrateur HxH 2 (M, conteur)' },
+    { id: 'b6efa2e7896645c28589046c576ddb2e', label: '🎬 Voix documentaire (M, calme)' },
+    { id: '005138dcb4cb481d8e1b57b9a2ab5633', label: '💬 Arnold (M, conversationnel)' },
+    { id: '276bd156a53f4a0199fff081bf083fc8', label: '🎓 Bon à savoir (M, autoritaire)' },
+    { id: 'f315cac8d48d4449ad73ac0f96099acd', label: '🧙 Vieux sage (M, profond)' },
+    { id: 'f30a4881085d42a1b073a1ca31a67cd8', label: '🎙️ Arnold 2 (M, social media)' },
+    { id: '0d494e6f958c4f96b7aafeec9cc0e460', label: '🎙️ Aaaaaw (M, narration)' },
+    { id: '0e05ee9f8c1f4ceb9ea924a62d7fbad4', label: '🗣️ Gabonais (M, autoritaire)' },
+    { id: 'a2dff3a6e6fa400583f90ce83454c99e', label: '🔔 Mara (M, posé)' },
+    { id: '150a7a6783d84b5298c8c28f33bfe6b8', label: '🎸 Voix rock (M, cinématique)' },
+];
+
 // Map engine → catalogue + label
 const VOICE_ENGINES = {
     azure_tts: {
@@ -117,6 +145,11 @@ const VOICE_ENGINES = {
         label: '⚡ Azure GPT-Realtime 1.5 (chat+TTS combinés)',
         voices: REALTIME_VOICES,
         defaultVoice: 'echo',
+    },
+    fish_audio: {
+        label: '🐟 Fish Audio s2-pro (voix FR clonées)',
+        voices: FISH_VOICES,
+        defaultVoice: '4f2a0684dd0247dda68f339738c780e6',  // Le narrateur
     },
 };
 
