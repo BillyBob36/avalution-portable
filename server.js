@@ -236,7 +236,7 @@ const BASE_TTS_RULES = `RÈGLES IMPÉRATIVES — TON TEXTE SERA LU PAR UN MOTEUR
    - Petits (< 100) : préfère les lettres ("vingt-cinq pour cent")
    - Grands / années / années : OK en chiffres ("1 500", "2026")
 
-7. RÉPONSES COURTES : 2 à 4 phrases maximum, sauf demande explicite de développer.
+7. LONGUEUR CIBLE : environ 300 à 400 caractères (2 à 4 phrases courtes). C'est une CIBLE, pas un plafond rigide — tu peux dépasser de 100-200 caractères pour terminer ta dernière phrase proprement. NE COUPE JAMAIS une phrase au milieu : finis toujours par un point, un point d'interrogation ou un point d'exclamation. Mieux vaut une réponse un peu plus longue mais complète qu'une coupure abrupte.
 
 8. Style oral conversationnel, chaleureux. Évite le ton rapport écrit, les phrases trop longues.`;
 
@@ -382,7 +382,10 @@ async function callAzureChat(userMessage, systemPrompt, history) {
     ];
     const body = {
         messages,
-        max_completion_tokens: 200,
+        // Headroom suffisant pour que le modèle termine sa phrase naturellement.
+        // La longueur réelle est pilotée par le prompt (~300-400 chars), pas par ce cap.
+        // 800 tokens ≈ 600 mots français = jamais atteint si le prompt est respecté.
+        max_completion_tokens: 800,
         temperature: 0.5,        // plus stable, moins créatif (Azure chat default = 1.0)
     };
     const response = await fetch(url, {
@@ -471,10 +474,12 @@ async function speakViaRealtime(text, voice, systemPrompt, temperature, history)
         const audioChunks = [];
         let textResponse = '';
         let sessionConfigured = false;
+        // Timeout 120s : assez pour générer ~800 tokens audio même à rythme lent
+        // (~25 t/s en burst), tout en évitant qu'une session "morte" reste ouverte.
         const timeout = setTimeout(() => {
             ws.close();
-            reject(new Error('Realtime timeout (60s)'));
-        }, 60000);
+            reject(new Error('Realtime timeout (120s)'));
+        }, 120000);
 
         ws.on('open', () => {
             ws.send(JSON.stringify({
@@ -487,9 +492,10 @@ async function speakViaRealtime(text, voice, systemPrompt, temperature, history)
                     turn_detection: null,
                     // Temperature paramétrable via slider front (range Azure : 0.6 - 1.2).
                     temperature: safeTemp,
-                    // Cap la longueur de réponse — limite la fenêtre dans laquelle la voix
-                    // peut "dériver" en mi-génération, et garde des réponses courtes.
-                    max_response_output_tokens: 300,
+                    // Headroom : la cible (~300-400 chars) est dans le prompt. Ce cap est juste
+                    // un filet de sécurité pour ne pas générer un monologue de 5 minutes en cas
+                    // de dérive — pas un plafond serré qui couperait au milieu d'une phrase.
+                    max_response_output_tokens: 800,
                     // Pas d'outils → pas de fonction-calling qui pourrait introduire des
                     // changements de mode/personnalité dans la génération.
                     tools: [],
