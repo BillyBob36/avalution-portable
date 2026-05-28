@@ -706,7 +706,9 @@ input[type="color"]::-webkit-color-swatch {
         padding: 10px;
         padding-top: max(10px, env(safe-area-inset-top));
         padding-bottom: max(10px, env(safe-area-inset-bottom));
-        justify-content: space-between;
+        /* center vertical → avatar + input groupés au milieu de l'écran
+           (au lieu de space-between qui collait l'avatar en haut) */
+        justify-content: center;
     }
 
     .settings-btn {
