@@ -462,10 +462,10 @@ async function speakViaRealtime(text, voice, systemPrompt, temperature, history)
     if (!AZURE_REALTIME_KEY || !AZURE_REALTIME_ENDPOINT) {
         throw new Error('Azure Realtime not configured');
     }
-    // Clamp dans la plage autorisée par Azure (0.6 - 1.2). Default = 1.2 (max).
+    // Clamp dans la plage autorisée par Azure (0.6 - 1.2). Default = 0.6 (min = max stable).
     const safeTemp = Number.isFinite(temperature)
         ? Math.max(0.6, Math.min(1.2, temperature))
-        : 1.2;
+        : 0.6;
     const safeHistory = Array.isArray(history) ? history : [];
     return new Promise((resolve, reject) => {
         const wsUrl = `${AZURE_REALTIME_ENDPOINT}?api-version=${AZURE_REALTIME_API_VERSION}&deployment=${AZURE_REALTIME_DEPLOYMENT}`;

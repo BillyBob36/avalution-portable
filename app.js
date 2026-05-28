@@ -254,7 +254,17 @@ class AvatarController {
             }
         } catch (_) {}
         this.minSilenceDuration = parseFloat(localStorage.getItem('avatar_min_silence') || '0.4');  // seuil silence (s)
-        this.realtimeTemperature = parseFloat(localStorage.getItem('avatar_temperature') || '1.2'); // 0.6 - 1.2 (Azure realtime)
+        // Migration : default temperature changé de 1.2 → 0.6 (plage Azure 0.6-1.2).
+        // Bump version pour forcer le reset des prefs existantes.
+        try {
+            const TEMP_VERSION = 2;
+            const saved = parseInt(localStorage.getItem('avatar_temperature_version') || '1', 10);
+            if (saved < TEMP_VERSION) {
+                localStorage.removeItem('avatar_temperature');
+                localStorage.setItem('avatar_temperature_version', String(TEMP_VERSION));
+            }
+        } catch (_) {}
+        this.realtimeTemperature = parseFloat(localStorage.getItem('avatar_temperature') || '0.6'); // 0.6 - 1.2 (Azure realtime)
 
         // Mémoire conversationnelle : array de {role: 'user'|'assistant', content: '...'}
         // Envoyée à chaque /api/speak. Donne au modèle :
