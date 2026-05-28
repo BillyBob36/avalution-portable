@@ -1,0 +1,35 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.*.local
+
+# Backups / fichiers de travail
+backups/
+raw-full.zip
+*.zip
+
+# Scripts de génération de frames (Colab, etc.) — pas nécessaires en runtime
+scripts/
+
+# Assets de dev seulement
+assets/
+tool-construct-smart-gif/
+
+# Claude session
+.claude/
+
+# Git / IDE
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Markdown / docs
+README.md
+*.md

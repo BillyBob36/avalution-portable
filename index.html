@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Avalution Portable</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <button class="settings-btn" id="settingsBtn" aria-label="Paramètres">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+        </button>
+
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <span>Paramètres</span>
+                <button class="settings-close" id="settingsClose">&times;</button>
+            </div>
+            <div class="settings-content">
+
+                <!-- ============ SECTION : AVATAR & QUALITÉ ============ -->
+                <details class="settings-section" open>
+                    <summary>
+                        <span class="section-icon">👤</span>
+                        <span class="section-title">Avatar &amp; qualité</span>
+                        <span class="section-chevron"></span>
+                    </summary>
+                    <div class="section-body">
+                        <div class="setting-item" id="avatarSettingItem" style="display:none;">
+                            <label>Avatar</label>
+                            <select id="avatarSelect">
+                                <option value="eric">Eric (DSI)</option>
+                            </select>
+                        </div>
+                        <div class="setting-item" id="qualityItem">
+                            <label>Qualité <span class="chroma-hint" id="qualityStatus"></span></label>
+                            <select id="qualitySelect">
+                                <option value="half">Half (480×480) — rapide</option>
+                                <option value="full">Full (960×960) — qualité originale</option>
+                            </select>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- ============ SECTION : VOIX ============ -->
+                <details class="settings-section">
+                    <summary>
+                        <span class="section-icon">🎙️</span>
+                        <span class="section-title">Voix</span>
+                        <span class="section-chevron"></span>
+                    </summary>
+                    <div class="section-body">
+                        <div class="setting-item">
+                            <label>Moteur de voix</label>
+                            <select id="engineSelect"></select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Voix</label>
+                            <select id="voiceSelect"></select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Pitch <em id="pitchValue" style="font-style:normal;color:#9aa5ff;font-weight:600;">0</em> cents <span style="opacity:.5;font-size:11px;">(grave ↔ aigu)</span></label>
+                            <input type="range" id="pitchSlider" min="-1200" max="1200" step="50" value="0">
+                        </div>
+                        <div class="setting-item">
+                            <label>Seuil pause détectée <em id="silenceValue" style="font-style:normal;color:#9aa5ff;font-weight:600;">0.70</em> s <span style="opacity:.5;font-size:11px;">(silence ≥ ce seuil → bouche fermée)</span></label>
+                            <input type="range" id="silenceSlider" min="0.20" max="2.00" step="0.05" value="0.70">
+                        </div>
+                        <div class="setting-item">
+                            <label>Température <em id="tempValue" style="font-style:normal;color:#9aa5ff;font-weight:600;">1.20</em> <span style="opacity:.5;font-size:11px;">(GPT-Realtime uniquement — 0.60 = stable / 1.20 = engagé)</span></label>
+                            <input type="range" id="tempSlider" min="0.60" max="1.20" step="0.05" value="1.20">
+                        </div>
+                        <div class="setting-item">
+                            <label>Mémoire conversationnelle <em id="memTurnCount" style="font-style:normal;color:#9aa5ff;font-weight:600;">0</em> échange(s) <span style="opacity:.5;font-size:11px;">(contexte envoyé à chaque tour)</span></label>
+                            <button id="clearMemoryBtn" class="clear-btn">Effacer la conversation</button>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- ============ SECTION : DÉTOURAGE ============ -->
+                <details class="settings-section">
+                    <summary>
+                        <span class="section-icon">✂️</span>
+                        <span class="section-title">Détourage</span>
+                        <span class="section-chevron"></span>
+                    </summary>
+                    <div class="section-body">
+                        <div class="setting-item" id="mattingMethodItem">
+                            <label>Méthode <span class="chroma-hint" id="mattingMethodStatus"></span></label>
+                            <select id="mattingMethodSelect">
+                                <!-- options injectées dynamiquement par JS -->
+                            </select>
+                        </div>
+                        <div class="setting-item" id="chromaKeyItem">
+                            <label>Chroma key <span class="chroma-hint" id="chromaStatus"></span></label>
+                            <label class="toggle-label">
+                                <input type="checkbox" id="edgeFlood" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Contour extérieur seul (flood-fill)</span>
+                            </label>
+                            <div class="slider-row">
+                                <span class="slider-label">Saturation max <em id="satRangeValue">40</em></span>
+                                <input type="range" id="satRange" min="10" max="80" step="1" value="40">
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">Luma écart max <em id="lumaRangeValue">80</em></span>
+                                <input type="range" id="lumaRange" min="20" max="150" step="1" value="80">
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">Seuil transparent <em id="transparentAboveValue">0.55</em></span>
+                                <input type="range" id="transparentAbove" min="0.30" max="0.95" step="0.01" value="0.55">
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">Seuil opaque <em id="opaqueBelowValue">0.25</em></span>
+                                <input type="range" id="opaqueBelow" min="0.00" max="0.50" step="0.01" value="0.25">
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- ============ SECTION : FOND ============ -->
+                <details class="settings-section">
+                    <summary>
+                        <span class="section-icon">🖼️</span>
+                        <span class="section-title">Fond</span>
+                        <span class="section-chevron"></span>
+                    </summary>
+                    <div class="section-body">
+                        <div class="setting-item" id="bgSettingItem">
+                            <div class="bg-thumbnails" id="bgThumbnails">
+                                <button class="bg-thumb" data-bg="none" title="Aucun fond">
+                                    <span class="bg-thumb-label">∅</span>
+                                </button>
+                                <button class="bg-thumb active" data-bg="backgrounds/office-1.png" title="Open space" style="background-image: url('backgrounds/office-1.png')"></button>
+                                <button class="bg-thumb" data-bg="backgrounds/office-2.png" title="Datacenter" style="background-image: url('backgrounds/office-2.png')"></button>
+                                <button class="bg-thumb" data-bg="backgrounds/office-3.png" title="NOC" style="background-image: url('backgrounds/office-3.png')"></button>
+                                <button class="bg-thumb" data-bg="backgrounds/office-4.png" title="Couloir tech" style="background-image: url('backgrounds/office-4.png')"></button>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- ============ SECTION : ÉCLAIRAGE CINÉMA ============ -->
+                <details class="settings-section">
+                    <summary>
+                        <span class="section-icon">🎬</span>
+                        <span class="section-title">Éclairage cinéma</span>
+                        <span class="section-chevron"></span>
+                    </summary>
+                    <div class="section-body">
+                        <div class="setting-item" id="lightingItem">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="lightingToggle" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Activer (gradient G→D)</span>
+                            </label>
+                            <div class="slider-row">
+                                <span class="slider-label">Mode de fusion</span>
+                                <select id="lightingBlendMode" class="inline-select">
+                                    <option value="screen">Screen (projection lumineuse)</option>
+                                    <option value="overlay" selected>Overlay (contrasté)</option>
+                                    <option value="soft-light">Soft Light (doux)</option>
+                                    <option value="lighten">Lighten (additif uniquement)</option>
+                                    <option value="multiply">Multiply (assombrit)</option>
+                                </select>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">Lumière gauche</span>
+                                <div class="lighting-row">
+                                    <input type="color" id="leftColor" value="#4dd5e8">
+                                    <input type="range" id="leftIntensity" min="0" max="100" step="1" value="62">
+                                    <em id="leftIntensityValue" class="lighting-value left">62%</em>
+                                </div>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-label">Lumière droite</span>
+                                <div class="lighting-row">
+                                    <input type="color" id="rightColor" value="#f5a02e">
+                                    <input type="range" id="rightIntensity" min="0" max="100" step="1" value="100">
+                                    <em id="rightIntensityValue" class="lighting-value right">100%</em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+            </div>
+        </div>
+
+        <div class="avatar-stage">
+            <div class="avatar-background" id="avatarBackground"></div>
+            <canvas id="avatarCanvas"></canvas>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Écrivez votre message à l'avatar..." autocomplete="off">
+            <button id="sendButton" aria-label="Faire parler l'avatar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

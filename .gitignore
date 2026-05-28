@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Fichiers de travail / dev — non requis runtime
+backups/
+assets/
+raw-full.zip
+*.zip
+
+# Claude session / IDE
+.claude/
+.vscode/
+.idea/

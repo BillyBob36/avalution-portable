@@ -1,0 +1,847 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    overscroll-behavior: none;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    padding: 20px;
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    position: relative;
+}
+
+/* ============================================
+   SETTINGS BUTTON + PANEL
+   ============================================ */
+
+.settings-btn {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top));
+    right: max(20px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    z-index: 100;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.settings-btn:hover,
+.settings-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.settings-btn svg {
+    stroke: white;
+}
+
+.settings-panel {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top));
+    right: max(20px, env(safe-area-inset-right));
+    width: 340px;
+    max-height: calc(100dvh - 40px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    background: rgba(20, 20, 40, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.settings-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.settings-header span {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.settings-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.settings-close:hover,
+.settings-close:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.settings-content {
+    padding: 8px 4px 8px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    /* Scroll smooth + scrollbar discrète */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+.settings-content::-webkit-scrollbar { width: 6px; }
+.settings-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+.settings-content::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================
+   COLLAPSIBLE SECTIONS (<details>)
+   ============================================ */
+
+.settings-section {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    margin: 0 12px;
+    overflow: hidden;
+    transition: background 0.15s ease;
+}
+
+.settings-section[open] {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(102, 126, 234, 0.25);
+}
+
+.settings-section summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
+}
+
+.settings-section summary::-webkit-details-marker,
+.settings-section summary::marker {
+    display: none;
+}
+
+.settings-section summary:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.section-icon {
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.section-title {
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.section-chevron {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+.settings-section[open] .section-chevron {
+    transform: rotate(45deg);
+}
+
+.section-body {
+    padding: 4px 14px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 2px;
+}
+
+/* ============================================
+   SETTING ITEMS
+   ============================================ */
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.setting-item label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.setting-item select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease;
+    min-height: 40px;
+}
+
+.setting-item select:focus {
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.setting-item select option {
+    background: #1a1a2e;
+    color: white;
+}
+
+.inline-select {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    width: 100%;
+    outline: none;
+}
+
+/* Bouton secondaire (style "destructif léger") pour effacer la mémoire conversationnelle */
+.clear-btn {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 100, 100, 0.08);
+    color: rgba(255, 180, 180, 0.92);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    min-height: 40px;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.clear-btn:hover {
+    background: rgba(255, 100, 100, 0.16);
+    border-color: rgba(255, 100, 100, 0.5);
+    color: rgba(255, 200, 200, 1);
+}
+
+.clear-btn:active {
+    background: rgba(255, 100, 100, 0.24);
+    transform: scale(0.98);
+}
+
+/* ============================================
+   BACKGROUND THUMBNAILS
+   ============================================ */
+
+.bg-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+.bg-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-color: rgba(255, 255, 255, 0.06);
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+    position: relative;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.bg-thumb:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.bg-thumb.active {
+    border-color: #667eea;
+    box-shadow: 0 0 12px rgba(102, 126, 234, 0.4);
+}
+
+.bg-thumb-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+/* ============================================
+   CHROMA KEY SLIDERS
+   ============================================ */
+
+.slider-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.slider-label {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+.slider-label em {
+    font-style: normal;
+    color: #9aa5ff;
+    font-weight: 600;
+}
+
+.chroma-hint {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: normal;
+    margin-left: 6px;
+}
+
+.chroma-hint.active {
+    color: #ffd166;
+}
+
+/* Lighting row : color picker + range + value */
+.lighting-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lighting-row input[type="range"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.lighting-value {
+    font-style: normal;
+    color: #9aa5ff;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.lighting-value.right {
+    color: #ffaa66;
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 6px 0;
+    touch-action: pan-y;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(102, 126, 234, 0.5);
+    transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 4px rgba(102, 126, 234, 0.5);
+}
+
+/* Toggle switch (réutilisable) */
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    padding: 6px 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 11px;
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.25s ease;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider {
+    background: #667eea;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider::before {
+    transform: translateX(16px);
+}
+
+.toggle-text {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+}
+
+/* ============================================
+   AVATAR STAGE (bg layer + matted avatar overlay)
+   ============================================ */
+
+.avatar-stage {
+    position: relative;
+    width: 480px;
+    height: 480px;
+    max-width: 65vh;
+    max-height: 65vh;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+        0 0 30px rgba(102, 126, 234, 0.3),
+        inset 0 0 30px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.1);
+}
+
+.avatar-background {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.3s ease;
+}
+
+/* Canvas : rendu unifié avatar + éclairage cinéma.
+   La taille interne (width/height attributes) suit la résolution de la source (480 ou 960),
+   le sizing visuel est géré par CSS comme une image normale (object-fit: contain). */
+#avatarCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    /* Anti-aliasing du downscale 960→affichage */
+    image-rendering: auto;
+}
+
+input[type="color"] {
+    width: 36px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+/* ============================================
+   INPUT
+   ============================================ */
+
+.input-container {
+    position: relative;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 90%;
+    max-width: 500px;
+}
+
+#userInput {
+    flex: 1;
+    padding: 16px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    min-width: 0;
+}
+
+#userInput::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+#userInput:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+#sendButton {
+    width: 54px;
+    height: 54px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#sendButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+#sendButton:active {
+    transform: scale(0.95);
+}
+
+#sendButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#sendButton svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* ============================================
+   RESPONSIVE — TABLET (≤ 768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 12px;
+        padding-top: max(12px, env(safe-area-inset-top));
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    .settings-btn {
+        top: max(12px, env(safe-area-inset-top));
+        right: max(12px, env(safe-area-inset-right));
+        width: 44px;
+        height: 44px;
+    }
+
+    .settings-panel {
+        top: max(12px, env(safe-area-inset-top));
+        right: max(12px, env(safe-area-inset-right));
+        left: max(12px, env(safe-area-inset-left));
+        width: auto;
+        max-width: calc(100vw - 24px);
+        max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    }
+
+    .settings-section {
+        margin: 0 10px;
+    }
+
+    .avatar-stage {
+        width: 75vw;
+        height: 75vw;
+        max-width: min(60vh, 480px);
+        max-height: min(60vh, 480px);
+    }
+
+    .input-container {
+        margin-top: 20px;
+        width: calc(100% - 24px);
+        gap: 10px;
+    }
+
+    #userInput {
+        padding: 14px 20px;
+        font-size: 16px;
+    }
+
+    #sendButton {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — MOBILE (≤ 480px)
+   ============================================ */
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+        padding-top: max(10px, env(safe-area-inset-top));
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        justify-content: space-between;
+    }
+
+    .settings-btn {
+        width: 42px;
+        height: 42px;
+    }
+
+    .settings-panel {
+        top: max(8px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        left: max(8px, env(safe-area-inset-left));
+        width: auto;
+        max-width: calc(100vw - 16px);
+        max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+        border-radius: 14px;
+    }
+
+    .settings-header {
+        padding: 12px 14px;
+    }
+
+    .settings-header span {
+        font-size: 15px;
+    }
+
+    .settings-content {
+        padding: 6px 2px;
+        gap: 4px;
+    }
+
+    .settings-section {
+        margin: 0 8px;
+        border-radius: 8px;
+    }
+
+    .settings-section summary {
+        padding: 11px 12px;
+        min-height: 44px;
+    }
+
+    .section-title {
+        font-size: 13px;
+    }
+
+    .section-body {
+        padding: 4px 12px 12px 12px;
+        gap: 12px;
+    }
+
+    .setting-item label {
+        font-size: 11px;
+    }
+
+    .setting-item select {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+
+    .toggle-text {
+        font-size: 12px;
+    }
+
+    .avatar-stage {
+        width: 90vw;
+        height: 90vw;
+        max-width: min(55vh, 360px);
+        max-height: min(55vh, 360px);
+        border-radius: 18px;
+        border-width: 2px;
+    }
+
+    .input-container {
+        margin-top: 16px;
+        width: 100%;
+        gap: 8px;
+    }
+
+    #userInput {
+        padding: 12px 18px;
+        font-size: 16px;
+    }
+
+    #sendButton {
+        width: 46px;
+        height: 46px;
+    }
+
+    #sendButton svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .bg-thumbnails {
+        gap: 5px;
+    }
+
+    .lighting-row {
+        gap: 6px;
+    }
+
+    .lighting-value {
+        min-width: 32px;
+        font-size: 11px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE — VERY SMALL HEIGHT (e.g. landscape phone)
+   ============================================ */
+
+@media (max-height: 500px) {
+    .container {
+        flex-direction: row;
+        gap: 16px;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+    }
+
+    .avatar-stage {
+        width: 80vh;
+        height: 80vh;
+        max-width: 380px;
+        max-height: 380px;
+    }
+
+    .input-container {
+        margin-top: 0;
+        width: 40vw;
+        max-width: 320px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    #userInput {
+        width: 100%;
+    }
+}
